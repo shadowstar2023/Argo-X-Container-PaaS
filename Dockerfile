@@ -1,6 +1,6 @@
 FROM node:latest
 # 添加一个非 root 用户
-RUN useradd -m -s /bin/bash myuser
+RUN useradd -m -s /bin/bash -u 10001 myuser
 
 # 切换到新用户
 USER myuser
