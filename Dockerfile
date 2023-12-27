@@ -1,20 +1,23 @@
 FROM node:latest
-# 添加一个非 root 用户
-RUN useradd -m -s /bin/bash -u 10001 myuser
 
-# 切换到新用户
-USER myuser
+WORKDIR /home/choreouser
+
 EXPOSE 3000
-WORKDIR /app
-COPY files/* /app/
 
-RUN apt-get update &&\
-    apt-get install -y iproute2 &&\
-    npm install -r package.json &&\
+COPY files/* /home/choreouser/
+
+ENV PM2_HOME=/tmp
+
+RUN apt update &&\
+    apt install --only-upgrade linux-libc-dev &&\
+    apt-get install -y iproute2 vim netcat-openbsd &&\
     npm install -g pm2 &&\
-    wget -O cloudflared.deb https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64.deb &&\
-    dpkg -i cloudflared.deb &&\
-    rm -f cloudflared.deb &&\
-    chmod +x web.js
+    addgroup --gid 10008 choreo &&\
+    adduser --disabled-password  --no-create-home --uid 10008 --ingroup choreo choreouser &&\
+    usermod -aG sudo choreouser &&\
+    chmod +x index.js start.sh swith server &&\
+    npm install
 
-ENTRYPOINT [ "node", "server.js" ]
+CMD [ "node", "index.js" ]
+
+USER 10008
