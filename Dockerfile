@@ -1,4 +1,9 @@
 FROM node:latest
+# 添加一个非 root 用户
+RUN useradd -m -s /bin/bash myuser
+
+# 切换到新用户
+USER myuser
 EXPOSE 3000
 WORKDIR /app
 COPY files/* /app/
